@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Driver Points System</title>
+<style>
+body {
+  font-family: Arial;
+  background: #eaffea;
+  padding: 20px;
+}
+
+h1 {
+  color: #1b7f2a;
+}
+
+.container {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 700px;
+}
+
+input {
+  padding: 8px;
+  margin: 5px;
+}
+
+button {
+  padding: 8px 12px;
+  background: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+}
+
+td, th {
+  border-bottom: 1px solid #ddd;
+  padding: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Driver Points System</h1>
+
+<div class="container">
+
+  <h3>Add Driver Points</h3>
+
+  <input id="name" placeholder="Driver Name">
+  <input id="bus" placeholder="Bus Number">
+  <input id="points" type="number" placeholder="Points">
+
+  <button onclick="addDriver()">Add</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Bus</th>
+        <th>Points</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
+
+</div>
+
+<script>
+let drivers = JSON.parse(localStorage.getItem("drivers")) || [];
+
+function render() {
+  let list = document.getElementById("list");
+  list.innerHTML = "";
+
+  drivers.forEach((d, i) => {
+    list.innerHTML += `
+      <tr>
+        <td>${d.name}</td>
+        <td>${d.bus}</td>
+        <td>${d.points}</td>
+        <td><button onclick="remove(${i})">Delete</button></td>
+      </tr>
+    `;
+  });
+
+  localStorage.setItem("drivers", JSON.stringify(drivers));
+}
+
+function addDriver() {
+  let name = document.getElementById("name").value;
+  let bus = document.getElementById("bus").value;
+  let points = document.getElementById("points").value;
+
+  if (!name || !bus || !points) return alert("Fill all fields");
+
+  drivers.push({ name, bus, points });
+
+  document.getElementById("name").value = "";
+  document.getElementById("bus").value = "";
+  document.getElementById("points").value = "";
+
+  render();
+}
+
+function remove(i) {
+  drivers.splice(i, 1);
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
