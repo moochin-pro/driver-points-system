@@ -2,212 +2,198 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Driver Points System</title>
+<title>Driver Performance System - Admin</title>
 <style>
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    padding: 40px;
-  }
-
-  .container {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    width: 100%;
-    max-width: 700px;
-  }
-
-  h1 { color: #1b7f2a; margin-top: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; }
+  .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
   
-  .form-group { margin-bottom: 15px; }
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+  .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: #e0e0e0; border-radius: 5px; font-weight: bold; }
+  .tab-btn.active { background: #1b7f2a; color: white; }
 
-  input {
-    padding: 10px;
-    margin: 5px 0;
-    width: calc(100% - 22px);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
+  .grid-inputs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+  input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
+  button { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+  .main-btn { background: #1b7f2a; color: white; width: 100%; font-size: 16px; }
+  .del-btn { background: #dc3545; color: white; padding: 5px 10px; }
+  .logout-btn { background: #6c757d; color: white; float: right; }
 
-  button {
-    padding: 10px 15px;
-    background: #28a745;
-    color: white;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-  }
-
-  button.delete-btn { background: #dc3545; }
-  button.logout-btn { background: #6c757d; float: right; }
-
-  table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-
-  td, th {
-    text-align: left;
-    border-bottom: 1px solid #eee;
-    padding: 12px;
-  }
-
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+  th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+  th { background: #f8f9fa; }
   .hidden { display: none; }
-  
-  #user-info {
-    background: #eaffea;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-  }
+  .user-tag { font-size: 0.8em; color: #666; font-style: italic; }
 </style>
 </head>
 <body>
 
-<div class="container">
-  
-  <div id="login-page">
-    <h1>System Login</h1>
-    <p>Please enter your credentials to manage points.</p>
-    <div class="form-group">
-      <input id="username" placeholder="Username (Try: admin)">
-      <input id="password" type="password" placeholder="Password (Try: 1234)">
-      <button onclick="login()" style="width: 100%; margin-top: 10px;">Login</button>
-    </div>
+<div id="login-screen" class="container" style="max-width: 400px; margin-top: 100px;">
+  <h2>Login</h2>
+  <input type="text" id="login-user" placeholder="Username">
+  <input type="password" id="login-pass" placeholder="Password">
+  <button class="main-btn" onclick="handleLogin()" style="margin-top: 10px;">Login</button>
+</div>
+
+<div id="main-app" class="container hidden">
+  <button class="logout-btn" onclick="logout()">Logout</button>
+  <h2 id="welcome-msg">Dashboard</h2>
+
+  <div class="tabs">
+    <div class="tab-btn active" onclick="showPage('input-page')">Add Points</div>
+    <div class="tab-btn" onclick="showPage('report-page')">Monthly Report</div>
+    <div id="admin-tab" class="tab-btn hidden" onclick="showPage('user-page')">Manage Users</div>
   </div>
 
-  <div id="dashboard" class="hidden">
-    <button class="logout-btn" onclick="logout()">Logout</button>
-    <h1>Driver Management</h1>
-    
-    <div id="user-info">
-      Welcome back, <strong id="display-user"></strong>!
+  <div id="input-page" class="page">
+    <div class="grid-inputs">
+      <input type="text" id="d-name" placeholder="Driver Name">
+      <input type="text" id="d-bus" placeholder="Bus Number">
+      <input type="date" id="d-date">
+      <input type="number" id="p-outfit" placeholder="Outfit">
+      <input type="number" id="p-action" placeholder="Action">
+      <input type="number" id="p-skill" placeholder="Skill">
+      <input type="number" id="p-comm" placeholder="Comm">
     </div>
+    <button class="main-btn" onclick="addEntry()">Save Record</button>
 
-    <h3>Add Driver Points</h3>
-    <div class="form-group">
-      <input id="driver-name" placeholder="Driver Name">
-      <input id="bus" placeholder="Bus Number">
-      <input id="points" type="number" placeholder="Points">
-      <button onclick="addDriver()">Add Entry</button>
-    </div>
-
-    <table>
+    <table id="recent-table">
       <thead>
         <tr>
-          <th>Name</th>
+          <th>Date</th>
+          <th>Driver</th>
           <th>Bus</th>
-          <th>Points</th>
+          <th>Total</th>
+          <th>Created By</th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="list"></tbody>
+      <tbody id="recent-list"></tbody>
     </table>
   </div>
 
+  <div id="report-page" class="page hidden">
+    <div id="monthly-content"></div>
+  </div>
+
+  <div id="user-page" class="page hidden">
+    <h3>Create New Staff User</h3>
+    <div class="grid-inputs">
+      <input type="text" id="new-user" placeholder="Staff Username">
+      <input type="text" id="new-pass" placeholder="Staff Password">
+      <button class="main-btn" onclick="createUser()">Create Staff</button>
+    </div>
+    <table id="user-table">
+        <thead><tr><th>Username</th><th>Role</th></tr></thead>
+        <tbody id="user-list"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-// Mock User Data
-const VALID_USER = "admin";
-const VALID_PASS = "1234";
+// Logic & Data
+let users = JSON.parse(localStorage.getItem("db_users")) || [
+    {user: "admin", pass: "Cambolink21@123", role: "admin"}
+];
+let records = JSON.parse(localStorage.getItem("db_records")) || [];
+let currentUser = null;
 
-let drivers = JSON.parse(localStorage.getItem("drivers")) || [];
-let currentUser = localStorage.getItem("currentUser");
+function handleLogin() {
+    const u = document.getElementById('login-user').value;
+    const p = document.getElementById('login-pass').value;
+    const found = users.find(x => x.user === u && x.pass === p);
 
-// Initialization: Check if already logged in
-function init() {
-  if (currentUser) {
-    showDashboard();
-  } else {
-    showLogin();
-  }
+    if (found) {
+        currentUser = found;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('welcome-msg').innerText = `Welcome, ${found.user} (${found.role})`;
+        if(found.role === 'admin') document.getElementById('admin-tab').classList.remove('hidden');
+        renderAll();
+    } else {
+        alert("Wrong credentials!");
+    }
 }
 
-// UI Toggles
-function showDashboard() {
-  document.getElementById("login-page").classList.add("hidden");
-  document.getElementById("dashboard").classList.remove("hidden");
-  document.getElementById("display-user").innerText = currentUser;
-  renderTable();
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.remove('hidden');
+    event.target.classList.add('active');
 }
 
-function showLogin() {
-  document.getElementById("login-page").classList.remove("hidden");
-  document.getElementById("dashboard").classList.add("hidden");
+function addEntry() {
+    const data = {
+        name: document.getElementById('d-name').value,
+        bus: document.getElementById('d-bus').value,
+        date: document.getElementById('d-date').value,
+        outfit: parseInt(document.getElementById('p-outfit').value) || 0,
+        action: parseInt(document.getElementById('p-action').value) || 0,
+        skill: parseInt(document.getElementById('p-skill').value) || 0,
+        comm: parseInt(document.getElementById('p-comm').value) || 0,
+        createdBy: currentUser.user,
+        id: Date.now()
+    };
+
+    if(!data.name || !data.date) return alert("Fill Name and Date");
+    records.push(data);
+    localStorage.setItem("db_records", JSON.stringify(records));
+    renderAll();
 }
 
-// Auth Logic
-function login() {
-  let user = document.getElementById("username").value;
-  let pass = document.getElementById("password").value;
+function renderAll() {
+    // Render Recent Table
+    const list = document.getElementById('recent-list');
+    list.innerHTML = "";
+    records.slice(-10).reverse().forEach(r => {
+        const total = r.outfit + r.action + r.skill + r.comm;
+        const canDelete = currentUser.role === 'admin';
+        list.innerHTML += `
+            <tr>
+                <td>${r.date}</td>
+                <td>${r.name}</td>
+                <td>${r.bus}</td>
+                <td><strong>${total}</strong></td>
+                <td><span class="user-tag">${r.createdBy}</span></td>
+                <td>${canDelete ? `<button class="del-btn" onclick="deleteRec(${r.id})">Delete</button>` : '<em>No Permission</em>'}</td>
+            </tr>`;
+    });
 
-  if (user === VALID_USER && pass === VALID_PASS) {
-    currentUser = user;
-    localStorage.setItem("currentUser", user);
-    showDashboard();
-  } else {
-    alert("Invalid credentials. Try admin / 1234");
-  }
+    // Render User List
+    const uList = document.getElementById('user-list');
+    uList.innerHTML = users.map(u => `<tr><td>${u.user}</td><td>${u.role}</td></tr>`).join('');
+
+    // Render Report
+    const reportDiv = document.getElementById('monthly-content');
+    const groups = records.reduce((acc, r) => {
+        const m = r.date.substring(0, 7);
+        if (!acc[m]) acc[m] = [];
+        acc[m].push(r);
+        return acc;
+    }, {});
+    
+    reportDiv.innerHTML = "";
+    for (let m in groups) {
+        reportDiv.innerHTML += `<h4>Month: ${m}</h4><table>` + 
+            groups[m].map(r => `<tr><td>${r.name}</td><td>Total: ${r.outfit+r.action+r.skill+r.comm}</td><td>By: ${r.createdBy}</td></tr>`).join('') + `</table>`;
+    }
 }
 
-function logout() {
-  localStorage.removeItem("currentUser");
-  currentUser = null;
-  showLogin();
+function createUser() {
+    const u = document.getElementById('new-user').value;
+    const p = document.getElementById('new-pass').value;
+    if(!u || !p) return alert("Enter details");
+    users.push({user: u, pass: p, role: "staff"});
+    localStorage.setItem("db_users", JSON.stringify(users));
+    renderAll();
 }
 
-// Data Logic
-function renderTable() {
-  let list = document.getElementById("list");
-  list.innerHTML = "";
-
-  drivers.forEach((d, i) => {
-    list.innerHTML += `
-      <tr>
-        <td>${d.name}</td>
-        <td>${d.bus}</td>
-        <td>${d.points}</td>
-        <td><button class="delete-btn" onclick="remove(${i})">Delete</button></td>
-      </tr>
-    `;
-  });
-
-  localStorage.setItem("drivers", JSON.stringify(drivers));
+function deleteRec(id) {
+    records = records.filter(r => r.id !== id);
+    localStorage.setItem("db_records", JSON.stringify(records));
+    renderAll();
 }
 
-function addDriver() {
-  let name = document.getElementById("driver-name").value;
-  let bus = document.getElementById("bus").value;
-  let points = document.getElementById("points").value;
-
-  if (!name || !bus || !points) return alert("Fill all fields");
-
-  drivers.push({ name, bus, points });
-  
-  // Clear inputs
-  document.getElementById("driver-name").value = "";
-  document.getElementById("bus").value = "";
-  document.getElementById("points").value = "";
-
-  renderTable();
-}
-
-function remove(i) {
-  if(confirm("Are you sure you want to delete this record?")) {
-    drivers.splice(i, 1);
-    renderTable();
-  }
-}
-
-// Start app
-init();
+function logout() { location.reload(); }
 </script>
 
 </body>
