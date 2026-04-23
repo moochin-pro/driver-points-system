@@ -4,82 +4,167 @@
 <meta charset="UTF-8">
 <title>Driver Points System</title>
 <style>
-body {
-  font-family: Arial;
-  background: #eaffea;
-  padding: 20px;
-}
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
 
-h1 {
-  color: #1b7f2a;
-}
+  .container {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    width: 100%;
+    max-width: 700px;
+  }
 
-.container {
-  background: white;
-  padding: 15px;
-  border-radius: 10px;
-  max-width: 700px;
-}
+  h1 { color: #1b7f2a; margin-top: 0; }
+  
+  .form-group { margin-bottom: 15px; }
 
-input {
-  padding: 8px;
-  margin: 5px;
-}
+  input {
+    padding: 10px;
+    margin: 5px 0;
+    width: calc(100% - 22px);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
 
-button {
-  padding: 8px 12px;
-  background: green;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
+  button {
+    padding: 10px 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
 
-table {
-  width: 100%;
-  margin-top: 15px;
-  border-collapse: collapse;
-}
+  button.delete-btn { background: #dc3545; }
+  button.logout-btn { background: #6c757d; float: right; }
 
-td, th {
-  border-bottom: 1px solid #ddd;
-  padding: 8px;
-}
+  table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  td, th {
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    padding: 12px;
+  }
+
+  .hidden { display: none; }
+  
+  #user-info {
+    background: #eaffea;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
 </style>
 </head>
-
 <body>
 
-<h1>Driver Points System</h1>
-
 <div class="container">
+  
+  <div id="login-page">
+    <h1>System Login</h1>
+    <p>Please enter your credentials to manage points.</p>
+    <div class="form-group">
+      <input id="username" placeholder="Username (Try: admin)">
+      <input id="password" type="password" placeholder="Password (Try: 1234)">
+      <button onclick="login()" style="width: 100%; margin-top: 10px;">Login</button>
+    </div>
+  </div>
 
-  <h3>Add Driver Points</h3>
+  <div id="dashboard" class="hidden">
+    <button class="logout-btn" onclick="logout()">Logout</button>
+    <h1>Driver Management</h1>
+    
+    <div id="user-info">
+      Welcome back, <strong id="display-user"></strong>!
+    </div>
 
-  <input id="name" placeholder="Driver Name">
-  <input id="bus" placeholder="Bus Number">
-  <input id="points" type="number" placeholder="Points">
+    <h3>Add Driver Points</h3>
+    <div class="form-group">
+      <input id="driver-name" placeholder="Driver Name">
+      <input id="bus" placeholder="Bus Number">
+      <input id="points" type="number" placeholder="Points">
+      <button onclick="addDriver()">Add Entry</button>
+    </div>
 
-  <button onclick="addDriver()">Add</button>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Bus</th>
-        <th>Points</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="list"></tbody>
-  </table>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Bus</th>
+          <th>Points</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
 
 </div>
 
 <script>
-let drivers = JSON.parse(localStorage.getItem("drivers")) || [];
+// Mock User Data
+const VALID_USER = "admin";
+const VALID_PASS = "1234";
 
-function render() {
+let drivers = JSON.parse(localStorage.getItem("drivers")) || [];
+let currentUser = localStorage.getItem("currentUser");
+
+// Initialization: Check if already logged in
+function init() {
+  if (currentUser) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
+}
+
+// UI Toggles
+function showDashboard() {
+  document.getElementById("login-page").classList.add("hidden");
+  document.getElementById("dashboard").classList.remove("hidden");
+  document.getElementById("display-user").innerText = currentUser;
+  renderTable();
+}
+
+function showLogin() {
+  document.getElementById("login-page").classList.remove("hidden");
+  document.getElementById("dashboard").classList.add("hidden");
+}
+
+// Auth Logic
+function login() {
+  let user = document.getElementById("username").value;
+  let pass = document.getElementById("password").value;
+
+  if (user === VALID_USER && pass === VALID_PASS) {
+    currentUser = user;
+    localStorage.setItem("currentUser", user);
+    showDashboard();
+  } else {
+    alert("Invalid credentials. Try admin / 1234");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("currentUser");
+  currentUser = null;
+  showLogin();
+}
+
+// Data Logic
+function renderTable() {
   let list = document.getElementById("list");
   list.innerHTML = "";
 
@@ -89,7 +174,7 @@ function render() {
         <td>${d.name}</td>
         <td>${d.bus}</td>
         <td>${d.points}</td>
-        <td><button onclick="remove(${i})">Delete</button></td>
+        <td><button class="delete-btn" onclick="remove(${i})">Delete</button></td>
       </tr>
     `;
   });
@@ -98,27 +183,31 @@ function render() {
 }
 
 function addDriver() {
-  let name = document.getElementById("name").value;
+  let name = document.getElementById("driver-name").value;
   let bus = document.getElementById("bus").value;
   let points = document.getElementById("points").value;
 
   if (!name || !bus || !points) return alert("Fill all fields");
 
   drivers.push({ name, bus, points });
-
-  document.getElementById("name").value = "";
+  
+  // Clear inputs
+  document.getElementById("driver-name").value = "";
   document.getElementById("bus").value = "";
   document.getElementById("points").value = "";
 
-  render();
+  renderTable();
 }
 
 function remove(i) {
-  drivers.splice(i, 1);
-  render();
+  if(confirm("Are you sure you want to delete this record?")) {
+    drivers.splice(i, 1);
+    renderTable();
+  }
 }
 
-render();
+// Start app
+init();
 </script>
 
 </body>
