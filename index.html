@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambolink21express | Premium Travel Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        /* Signature Gradient: Green to Blue */
+        .hero-gradient { background: linear-gradient(135deg, rgba(6, 78, 59, 0.9) 0%, rgba(30, 58, 138, 0.8) 100%); }
+        .card-hover { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-12px); box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.2); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: -4px; left: 0; background: #10b981; transition: width 0.3s; }
+        .nav-link:hover::after { width: 100%; }
+        
+        .branch-image-container { position: relative; overflow: hidden; border-radius: 1.5rem 1.5rem 0 0; height: 160px; }
+        .branch-image { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .card-hover:hover .branch-image { transform: scale(1.1); }
+
+        /* Custom scrollbar matching brand colors */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #10b981; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #059669; }
+
+        select { appearance: none; cursor: pointer; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Header -->
+<header class="fixed w-full z-50 glass border-b border-emerald-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+            <!-- Logo Section -->
+            <div class="flex items-center gap-2">
+                <!-- Logo without green box -->
+                <img src="images/logo.png" 
+                     alt="Cambolink21express Logo" 
+                     class="w-20 h-20 object-contain rounded-lg">
+
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="hidden md:flex space-x-8 font-medium text-slate-600">
+                <a href="#home" class="nav-link hover:text-emerald-600 transition-colors">Home</a>
+                <a href="#about" class="nav-link hover:text-emerald-600 transition-colors">About Us</a>
+                <a href="#branches" class="nav-link hover:text-emerald-600 transition-colors">Branches</a>
+                <a href="#contact" class="nav-link hover:text-emerald-600 transition-colors">Contact</a>
+            </nav>
+
+            <!-- Buttons -->
+            <div class="flex items-center gap-4">
+                <button class="hidden sm:block text-slate-600 font-medium px-4 py-2 hover:text-emerald-600 transition-colors">Sign In</button>
+                <button class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all shadow-lg shadow-emerald-200 flex items-center gap-2">
+                    Book Now
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+    <!-- Home / Hero Section -->
+    <section id="home" class="relative pt-20 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=2071" 
+                 class="w-full h-full object-cover" alt="Luxury Bus">
+            <div class="absolute inset-0 hero-gradient"></div>
+        </div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-4 pt-32 pb-48 text-center sm:pt-48 sm:pb-64">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 text-emerald-300 text-sm font-bold mb-6">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                Now Operating in 10 Major Cities
+            </div>
+            <h1 class="text-4xl sm:text-6xl font-extrabold text-white mb-6 leading-tight">
+                Your Journey, Our <span class="text-emerald-400">Green</span> <span class="text-blue-400">Promise.</span>
+            </h1>
+            <p class="text-lg sm:text-xl text-slate-200 mb-10 max-w-2xl mx-auto">
+                Premium bus travel with the comfort of a lounge. High-speed WiFi, leather seating, and eco-friendly operations.
+            </p>
+
+            <!-- Modern Search Box (Updated with Select inputs) -->
+            <div class="max-w-5xl mx-auto bg-white p-4 sm:p-2 rounded-2xl sm:rounded-full shadow-2xl flex flex-col sm:flex-row gap-2 border border-emerald-50">
+                <div class="flex-1 flex items-center px-6 py-3 border-b sm:border-b-0 sm:border-r border-slate-100">
+                    <i data-lucide="map-pin" class="text-emerald-500 mr-3 w-5 h-5"></i>
+                    <div class="text-left w-full">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">From</p>
+                        <select class="w-full bg-transparent outline-none text-slate-700 font-medium cursor-pointer">
+                            <option value="" disabled selected>Select Departure City</option>
+                            <option value="ny">New York</option>
+                            <option value="la">Los Angeles</option>
+                            <option value="ch">Chicago</option>
+                            <option value="mi">Miami</option>
+                            <option value="ho">Houston</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center px-6 py-3 border-b sm:border-b-0 sm:border-r border-slate-100">
+                    <i data-lucide="navigation" class="text-blue-500 mr-3 w-5 h-5"></i>
+                    <div class="text-left w-full">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">To</p>
+                        <select class="w-full bg-transparent outline-none text-slate-700 font-medium cursor-pointer">
+                            <option value="" disabled selected>Select Arrival City</option>
+                            <option value="ny">New York</option>
+                            <option value="la">Los Angeles</option>
+                            <option value="ch">Chicago</option>
+                            <option value="mi">Miami</option>
+                            <option value="ho">Houston</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center px-6 py-3">
+                    <i data-lucide="calendar" class="text-emerald-500 mr-3 w-5 h-5"></i>
+                    <div class="text-left">
+                        <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Date</p>
+                        <input type="date" class="w-full outline-none text-slate-700 font-medium">
+                    </div>
+                </div>
+                <button class="bg-emerald-600 hover:bg-emerald-700 text-white sm:px-10 py-4 rounded-xl sm:rounded-full font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-200">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                    Search Tickets
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1000" 
+                         class="rounded-3xl shadow-2xl z-10 relative" alt="About SwiftBus">
+                    <div class="absolute -bottom-8 -right-8 w-64 h-64 bg-emerald-50 rounded-full -z-0"></div>
+                </div>
+                <div>
+                    <span class="text-emerald-600 font-bold uppercase tracking-widest text-sm">Since 1998</span>
+                    <h2 class="text-4xl font-extrabold text-slate-900 mt-4 mb-6 leading-tight">Redefining sustainable travel across the country.</h2>
+                    <p class="text-slate-600 text-lg mb-8 leading-relaxed">
+                        SwiftBus combines eco-friendly fleet management with premium passenger comfort. We believe that traveling by bus should be the most efficient, comfortable, and green way to move between cities.
+                    </p>
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-3xl font-bold text-emerald-600">5M+</h4>
+                            <p class="text-slate-500 font-medium">Annual Passengers</p>
+                        </div>
+                        <div>
+                            <h4 class="text-3xl font-bold text-blue-600">10</h4>
+                            <p class="text-slate-500 font-medium">Premium Hubs</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Branches Section -->
+    <section id="branches" class="py-24 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-4 text-center">Visit Our Signature Branches</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto">Explore our 10 eco-friendly terminals, each designed to offer a seamless transition from the city to your journey.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
+                <!-- Branch 1: New York -->
+                <div class="bg-white rounded-3xl border border-slate-100 card-hover flex flex-col">
+                    <div class="branch-image-container">
+                        <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&q=80&w=600" class="branch-image" alt="New York">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="map-pin" class="text-emerald-500 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-900 text-lg">New York</h3>
+                        </div>
+                        <p class="text-slate-500 text-xs mb-4 font-medium">7th Ave & W 31st St, Manhattan</p>
+                        <button class="w-full py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="navigation-2" class="w-3 h-3 text-blue-500"></i> View Terminal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Branch 2: Los Angeles -->
+                <div class="bg-white rounded-3xl border border-slate-100 card-hover flex flex-col">
+                    <div class="branch-image-container">
+                        <img src="https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&q=80&w=600" class="branch-image" alt="Los Angeles">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="map-pin" class="text-emerald-500 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-900 text-lg">Los Angeles</h3>
+                        </div>
+                        <p class="text-slate-500 text-xs mb-4 font-medium">800 N Alameda St, LA Gateway</p>
+                        <button class="w-full py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="navigation-2" class="w-3 h-3 text-blue-500"></i> View Terminal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Branch 3: Chicago -->
+                <div class="bg-white rounded-3xl border border-slate-100 card-hover flex flex-col">
+                    <div class="branch-image-container">
+                        <img src="https://images.unsplash.com/photo-1494522855154-9297ac14b55f?auto=format&fit=crop&q=80&w=600" class="branch-image" alt="Chicago">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="map-pin" class="text-emerald-500 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-900 text-lg">Chicago</h3>
+                        </div>
+                        <p class="text-slate-500 text-xs mb-4 font-medium">225 S Canal St, Union Station</p>
+                        <button class="w-full py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="navigation-2" class="w-3 h-3 text-blue-500"></i> View Terminal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Branch 4: Miami -->
+                <div class="bg-white rounded-3xl border border-slate-100 card-hover flex flex-col">
+                    <div class="branch-image-container">
+                        <img src="https://images.unsplash.com/photo-1514214246283-d427a95c5d2f?auto=format&fit=crop&q=80&w=600" class="branch-image" alt="Miami">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="map-pin" class="text-emerald-500 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-900 text-lg">Miami</h3>
+                        </div>
+                        <p class="text-slate-500 text-xs mb-4 font-medium">3801 NW 21st St, Airport Hub</p>
+                        <button class="w-full py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="navigation-2" class="w-3 h-3 text-blue-500"></i> View Terminal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Branch 5: Houston -->
+                <div class="bg-white rounded-3xl border border-slate-100 card-hover flex flex-col">
+                    <div class="branch-image-container">
+                        <img src="https://images.unsplash.com/photo-1530089711124-9ca31fb9e863?auto=format&fit=crop&q=80&w=600" class="branch-image" alt="Houston">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="map-pin" class="text-emerald-500 w-4 h-4"></i>
+                            <h3 class="font-bold text-slate-900 text-lg">Houston</h3>
+                        </div>
+                        <p class="text-slate-500 text-xs mb-4 font-medium">2121 Main St, Transit Center</p>
+                        <button class="w-full py-2 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100 hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="navigation-2" class="w-3 h-3 text-blue-500"></i> View Terminal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section id="contact" class="py-24 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 relative z-10">
+            <div class="bg-emerald-900 rounded-[3rem] p-8 sm:p-16 flex flex-col lg:flex-row gap-16 shadow-2xl shadow-emerald-900/20">
+                <div class="lg:w-1/2">
+                    <h2 class="text-4xl font-bold text-white mb-6">Let's Connect</h2>
+                    <p class="text-emerald-100/70 mb-10 text-lg">Questions about your green journey? Our support team is ready to help you travel better.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-4 text-white group cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-emerald-500 transition-all">
+                                <i data-lucide="mail" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-emerald-300 font-bold uppercase tracking-wider">Email Us</p>
+                                <p class="font-medium">support@swiftbus.travel</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-white group cursor-pointer">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center group-hover:bg-blue-500 transition-all">
+                                <i data-lucide="headphones" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-blue-300 font-bold uppercase tracking-wider">24/7 Support</p>
+                                <p class="font-medium">1-800-SWIFTBUS</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 bg-white/5 backdrop-blur-md p-8 rounded-3xl border border-white/10">
+                    <form class="space-y-6">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-emerald-100 text-sm font-semibold mb-2">Full Name</label>
+                                <input type="text" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-white/20" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-emerald-100 text-sm font-semibold mb-2">Email Address</label>
+                                <input type="email" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-white/20" placeholder="john@example.com">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-emerald-100 text-sm font-semibold mb-2">Message</label>
+                            <textarea rows="4" class="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all placeholder:text-white/20" placeholder="How can we help?"></textarea>
+                        </div>
+                        <button class="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-emerald-500/20">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 pt-20 pb-10 border-t border-emerald-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-12 mb-16">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center gap-2 mb-6">
+                        <div>
+                            <!-- Footer Logo Placeholder -->
+                            <div class="w-5 h-5">
+                            <img src="images/logo.png" alt="" srcset="">
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Pioneering the future of green mobility and luxury travel across the continent.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-6">Company</h4>
+                    <ul class="space-y-4 text-slate-500 text-sm font-medium">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Our Story</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Sustainability Report</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Fleet Details</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Partner with Us</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-6">Traveler Help</h4>
+                    <ul class="space-y-4 text-slate-500 text-sm font-medium">
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Track My Bus</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Cancel & Refund</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Luggage Policy</a></li>
+                        <li><a href="#" class="hover:text-emerald-600 transition-colors">Safety Protocols</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-6">Stay Updated</h4>
+                    <p class="text-slate-500 text-sm mb-4">Join our community for exclusive green travel deals.</p>
+                    <div class="flex gap-2">
+                        <input type="email" placeholder="Your Email" class="bg-white border border-emerald-100 rounded-lg px-4 py-2 w-full outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                        <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-all shadow-md shadow-emerald-100">
+                            <i data-lucide="send" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs font-medium">
+                <p>&copy; 2024 SwiftBus Green Mobility. Crafted for Excellence.</p>
+                <div class="flex gap-8">
+                    <span class="hover:text-emerald-600 cursor-pointer transition-colors">Privacy</span>
+                    <span class="hover:text-emerald-600 cursor-pointer transition-colors">Terms</span>
+                    <span class="hover:text-emerald-600 cursor-pointer transition-colors">Cookies</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Handle form submission without alert
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Message Received!';
+            btn.classList.replace('bg-emerald-500', 'bg-blue-500');
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.classList.replace('bg-blue-500', 'bg-emerald-500');
+                this.reset();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
