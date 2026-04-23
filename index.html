@@ -1,149 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Rating</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="UTF-8">
+<title>Driver Performance System</title>
+<style>
+  :root { --primary: #1b7f2a; --danger: #dc3545; --dark: #2d3436; --light: #f9f9f9; }
+  body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 20px; }
+  .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
+  .tab-btn { padding: 12px 20px; cursor: pointer; border: none; background: none; font-weight: bold; color: #636e72; }
+  .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
 
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
+  input { padding: 12px; border: 1px solid #dfe6e9; border-radius: 6px; width: 100%; box-sizing: border-box; }
+  .limit-note { font-size: 11px; color: #d63031; margin-top: -15px; margin-bottom: 15px; display: block; }
+  
+  button.save-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 16px; }
+  
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+  th { background: #f1f2f6; font-size: 13px; color: #2d3436; }
+  
+  .hidden { display: none; }
+  .logout-btn { float: right; background: #b2bec3; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+  .status-tag { font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #e8f5e9; color: #2e7d32; font-weight: bold; }
+  .month-wrap { margin-top: 30px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+  .month-head { background: var(--dark); color: white; padding: 10px 15px; margin: 0; }
+</style>
 </head>
-<body class="bg-emerald-50/30 min-h-screen py-8 px-4 font-sans text-gray-900">
+<body>
 
-    <!-- Language Switcher -->
-    <div class="max-w-md mx-auto mb-4 flex justify-end gap-2">
-        <button onclick="setLanguage('en')" class="lang-btn active px-3 py-1 text-xs font-bold border border-emerald-200 rounded-full bg-white transition-all hover:border-emerald-500" data-lang="en">EN</button>
-        <button onclick="setLanguage('zh')" class="lang-btn px-3 py-1 text-xs font-bold border border-emerald-200 rounded-full bg-white transition-all hover:border-emerald-500" data-lang="zh">中文</button>
-        <button onclick="setLanguage('km')" class="lang-btn px-3 py-1 text-xs font-bold border border-emerald-200 rounded-full bg-white transition-all hover:border-emerald-500" data-lang="km">ភាសាខ្មែរ</button>
+<div id="auth-page" class="container" style="max-width: 400px; margin-top: 80px;">
+  <h2 style="text-align: center; color: var(--primary);">System Login</h2>
+  <input type="text" id="u-name" placeholder="Username" style="margin-bottom: 10px;">
+  <input type="password" id="u-pass" placeholder="Password">
+  <button class="save-btn" onclick="doLogin()" style="margin-top: 15px;">Login</button>
+</div>
+
+<div id="app-page" class="container hidden">
+  <button class="logout-btn" onclick="location.reload()">Logout</button>
+  <h2 id="user-greet">Dashboard</h2>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('entry-tab')">Input Points</button>
+    <button class="tab-btn" onclick="switchTab('report-tab')">Driver Monthly Summary</button>
+    <button id="adm-nav" class="tab-btn hidden" onclick="switchTab('adm-tab')">Manage Users</button>
+  </div>
+
+  <div id="entry-tab" class="page">
+    <div class="grid">
+      <input type="text" id="in-name" placeholder="Driver Name">
+      <input type="text" id="in-bus" placeholder="Bus Number">
+      <input type="date" id="in-date">
+      <input type="number" id="in-o" placeholder="Outfit (0-10)" min="0" max="10">
+      <input type="number" id="in-a" placeholder="Action (0-10)" min="0" max="10">
+      <input type="number" id="in-s" placeholder="Skill (0-10)" min="0" max="10">
+      <input type="number" id="in-c" placeholder="Comm (0-10)" min="0" max="10">
     </div>
+    <span class="limit-note">* Maximum allowed per category is 10 points.</span>
+    <button class="save-btn" onclick="saveData()">Save Entry</button>
 
-    <!-- MAIN CONTAINER -->
-    <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl shadow-emerald-900/5 border border-emerald-100 overflow-hidden min-h-[500px] flex flex-col relative">
-        
-        <!-- STEP 1: WELCOME PAGE -->
-        <div id="step-welcome" class="flex-1 flex flex-col p-8 text-center animate-slide-in justify-center">
-            <div class="mb-4">
-                <!-- LOGO ONLY -->
-                <div class="brand-logo-container">
-                    <img 
-                        id="welcome-logo" 
-                        src="assets/logo.png" 
-                        alt="Company Logo"
-                        class="w-full h-full object-contain"
-                    >
-                </div>
-            </div>
+    <h3>Detailed Recent Activity</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Date</th><th>Driver</th><th>Bus</th>
+          <th>O</th><th>A</th><th>S</th><th>C</th>
+          <th>Total</th><th>User</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="recent-list"></tbody>
+    </table>
+  </div>
 
-            <div class="space-y-4 mb-4">
-                <button onclick="showStep('step-scan')" class="w-full flex items-center justify-between p-4 border-2 border-emerald-100 rounded-2xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white transition-all">
-                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span id="txt-btn-scan" class="block font-bold text-emerald-900">Scan QR Code</span>
-                            <span id="txt-btn-scan-desc" class="text-xs text-gray-400">Scan the sticker in the vehicle</span>
-                        </div>
-                    </div>
-                </button>
+  <div id="report-tab" class="page hidden">
+    <h3>Monthly Totals by Driver Name</h3>
+    <div id="driver-report-list"></div>
+  </div>
 
-                <button onclick="showStep('step-manual')" class="w-full flex items-center justify-between p-4 border-2 border-emerald-100 rounded-2xl hover:border-emerald-500 hover:bg-emerald-50 transition-all group">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center mr-4 group-hover:bg-white transition-all">
-                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </div>
-                        <div class="text-left">
-                            <span id="txt-btn-manual" class="block font-bold text-emerald-900">Manual Entry</span>
-                            <span id="txt-btn-manual-desc" class="text-xs text-gray-400">Type the plate number</span>
-                        </div>
-                    </div>
-                </button>
-            </div>
-
-            <!-- Admin Login Link -->
-            <div class="mt-4">
-                <button onclick="window.location.href='user-login.html'" class="text-[10px] font-bold text-emerald-600/50 hover:text-emerald-600 uppercase tracking-widest transition-colors py-2 px-4 rounded-lg">
-                  Login
-                </button>
-            </div>
-        </div>
-        <!-- STEP 2: SCAN QR PAGE -->
-        <div id="step-scan" class="hidden flex-1 flex flex-col p-8 text-center animate-slide-in">
-            <button onclick="showStep('step-welcome')" class="self-start text-emerald-600 font-bold text-sm mb-6 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Back
-            </button>
-            <h2 id="txt-scan-title" class="text-xl font-bold mb-6 text-emerald-900">Position QR inside frame</h2>
-            <div class="relative w-full aspect-square max-w-[250px] mx-auto bg-gray-900 rounded-3xl overflow-hidden mb-8">
-                <div class="scan-line"></div>
-                <div class="absolute inset-0 flex items-center justify-center opacity-30">
-                    <svg class="w-20 h-20 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
-                </div>
-            </div>
-            <button onclick="handleSuccessfulIdentification('QR-9902')" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg">
-                Simulate Successful Scan
-            </button>
-        </div>
-
-        <!-- STEP 3: MANUAL ENTRY PAGE -->
-        <div id="step-manual" class="hidden flex-1 flex flex-col p-8 animate-slide-in">
-            <button onclick="showStep('step-welcome')" class="self-start text-emerald-600 font-bold text-sm mb-6 flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                Back
-            </button>
-            <h2 id="txt-manual-title" class="text-xl font-bold mb-4 text-center text-emerald-900">Enter Plate Number</h2>
-            <div class="space-y-6">
-                <div>
-                    <input type="text" id="plate-input" placeholder="e.g. ABC-1234" class="w-full text-center text-2xl font-bold p-4 bg-gray-50 border-2 border-emerald-100 rounded-2xl focus:border-emerald-500 outline-none uppercase font-mono">
-                </div>
-                <button onclick="handleSuccessfulIdentification(document.getElementById('plate-input').value)" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl shadow-lg">
-                    Find Driver
-                </button>
-            </div>
-        </div>
-
-        <!-- STEP 4: RATING FORM -->
-        <div id="step-rating" class="hidden flex-col">
-            <div class="bg-emerald-900 p-8 text-white text-center">
-                <div class="w-16 h-16 bg-emerald-800 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
-                    <img src="https://ui-avatars.com/api/?name=DR&background=10b981&color=fff&size=64" alt="Driver" class="w-full h-full">
-                </div>
-                <h1 id="txt-title" class="text-xl font-bold tracking-tight">Rate Your Driver</h1>
-                <div class="mt-2">
-                    <span id="active-plate" class="plate-badge text-xs">---</span>
-                </div>
-            </div>
-
-            <form id="ratingForm" class="p-6 space-y-4">
-                <div class="space-y-3">
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q1" class="font-semibold text-xs mb-1 text-gray-700">1. Driver Punctuality</p><div class="star-rating"><input type="radio" id="q1-5" name="q1" value="5"><label for="q1-5">★</label><input type="radio" id="q1-4" name="q1" value="4"><label for="q1-4">★</label><input type="radio" id="q1-3" name="q1" value="3"><label for="q1-3">★</label><input type="radio" id="q1-2" name="q1" value="2"><label for="q1-2">★</label><input type="radio" id="q1-1" name="q1" value="1"><label for="q1-1">★</label></div></div>
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q2" class="font-semibold text-xs mb-1 text-gray-700">2. Vehicle Cleanliness</p><div class="star-rating"><input type="radio" id="q2-5" name="q2" value="5"><label for="q2-5">★</label><input type="radio" id="q2-4" name="q2" value="4"><label for="q2-4">★</label><input type="radio" id="q2-3" name="q2" value="3"><label for="q2-3">★</label><input type="radio" id="q2-2" name="q2" value="2"><label for="q2-2">★</label><input type="radio" id="q2-1" name="q2" value="1"><label for="q2-1">★</label></div></div>
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q3" class="font-semibold text-xs mb-1 text-gray-700">3. Driving Safety & Speed</p><div class="star-rating"><input type="radio" id="q3-5" name="q3" value="5"><label for="q3-5">★</label><input type="radio" id="q3-4" name="q3" value="4"><label for="q3-4">★</label><input type="radio" id="q3-3" name="q3" value="3"><label for="q3-3">★</label><input type="radio" id="q3-2" name="q3" value="2"><label for="q3-2">★</label><input type="radio" id="q3-1" name="q3" value="1"><label for="q3-1">★</label></div></div>
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q4" class="font-semibold text-xs mb-1 text-gray-700">4. Route Knowledge</p><div class="star-rating"><input type="radio" id="q4-5" name="q4" value="5"><label for="q4-5">★</label><input type="radio" id="q4-4" name="q4" value="4"><label for="q4-4">★</label><input type="radio" id="q4-3" name="q4" value="3"><label for="q4-3">★</label><input type="radio" id="q4-2" name="q4" value="2"><label for="q4-2">★</label><input type="radio" id="q4-1" name="q4" value="1"><label for="q4-1">★</label></div></div>
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q5" class="font-semibold text-xs mb-1 text-gray-700">5. Professionalism/Courteousness</p><div class="star-rating"><input type="radio" id="q5-5" name="q5" value="5"><label for="q5-5">★</label><input type="radio" id="q5-4" name="q5" value="4"><label for="q5-4">★</label><input type="radio" id="q5-3" name="q5" value="3"><label for="q5-3">★</label><input type="radio" id="q5-2" name="q5" value="2"><label for="q5-2">★</label><input type="radio" id="q5-1" name="q5" value="1"><label for="q5-1">★</label></div></div>
-                    <div class="rating-group bg-gray-50 p-3 rounded-xl"><p id="txt-q6" class="font-semibold text-xs mb-1 text-gray-700">6. Overall Satisfaction</p><div class="star-rating"><input type="radio" id="q6-5" name="q6" value="5"><label for="q6-5">★</label><input type="radio" id="q6-4" name="q6" value="4"><label for="q6-4">★</label><input type="radio" id="q6-3" name="q6" value="3"><label for="q6-3">★</label><input type="radio" id="q6-2" name="q6" value="2"><label for="q6-2">★</label><input type="radio" id="q6-1" name="q6" value="1"><label for="q6-1">★</label></div></div>
-                </div>
-                <div class="pt-2">
-                    <textarea id="comments" rows="2" placeholder="Tell us more..." class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all text-sm"></textarea>
-                </div>
-                <button type="submit" id="txt-btn-submit" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 active:scale-[0.98] transition-all shadow-lg">Submit Rating</button>
-            </form>
-        </div>
-
-        <!-- STEP 5: SUCCESS -->
-        <div id="successMessage" class="hidden flex-1 flex flex-col items-center justify-center p-10 text-center animate-slide-in">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-6">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            </div>
-            <h2 id="txt-success-title" class="text-2xl font-bold mb-2 text-emerald-900">Feedback Received!</h2>
-            <p id="txt-success-body" class="text-gray-500 mb-8">Thank you for your rating.</p>
-            <button onclick="location.reload()" id="txt-btn-again" class="inline-flex items-center text-emerald-700 font-semibold hover:text-emerald-800 transition-colors">Back Home</button>
-        </div>
+  <div id="adm-tab" class="page hidden">
+    <h3>User Management</h3>
+    <div class="grid">
+      <input type="text" id="new-u" placeholder="New Username">
+      <input type="text" id="new-p" placeholder="New Password">
+      <button class="save-btn" onclick="addUser()">Create Staff Account</button>
     </div>
-        <link rel="stylesheet" href="css/style.css">
-        <script src="js/lang.js"></script>
+    <h4 style="margin-top: 30px;">Active System Users</h4>
+    <table id="user-mgmt-table">
+      <thead><tr><th>Username</th><th>Role</th><th>Password</th><th>Action</th></tr></thead>
+      <tbody id="admin-user-list"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+let db_users = JSON.parse(localStorage.getItem("bus_users")) || [{user: "admin", pass: "Cambolink21@123", role: "admin"}];
+let db_data = JSON.parse(localStorage.getItem("bus_data")) || [];
+let activeSession = null;
+
+function doLogin() {
+  const u = document.getElementById('u-name').value;
+  const p = document.getElementById('u-pass').value;
+  const user = db_users.find(x => x.user === u && x.pass === p);
+  if (user) {
+    activeSession = user;
+    document.getElementById('auth-page').classList.add('hidden');
+    document.getElementById('app-page').classList.remove('hidden');
+    document.getElementById('user-greet').innerText = `Welcome, ${user.user}`;
+    if (user.role === 'admin') {
+        document.getElementById('adm-nav').classList.remove('hidden');
+        renderAdminUserList();
+    }
+    renderRecent();
+  } else { alert("Invalid Credentials"); }
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.remove('hidden');
+  event.currentTarget.classList.add('active');
+  if (id === 'report-tab') renderDriverReport();
+}
+
+function saveData() {
+  const o = parseInt(document.getElementById('in-o').value) || 0;
+  const a = parseInt(document.getElementById('in-a').value) || 0;
+  const s = parseInt(document.getElementById('in-s').value) || 0;
+  const c = parseInt(document.getElementById('in-c').value) || 0;
+
+  if (o > 10 || a > 10 || s > 10 || c > 10) return alert("Limit is 10 points!");
+
+  const entry = {
+    id: Date.now(),
+    name: document.getElementById('in-name').value.trim(),
+    bus: document.getElementById('in-bus').value.trim(),
+    date: document.getElementById('in-date').value,
+    o, a, s, c,
+    by: activeSession.user
+  };
+
+  if(!entry.name || !entry.date) return alert("Driver Name and Date required");
+  db_data.push(entry);
+  localStorage.setItem("bus_data", JSON.stringify(db_data));
+  renderRecent();
+  ['in-name','in-bus','in-o','in-a','in-s','in-c'].forEach(id => document.getElementById(id).value = "");
+}
+
+function renderRecent() {
+  const list = document.getElementById('recent-list');
+  list.innerHTML = "";
+  [...db_data].reverse().slice(0,10).forEach(r => {
+    const total = r.o + r.a + r.s + r.c;
+    list.innerHTML += `<tr>
+      <td>${r.date}</td><td>${r.name}</td><td><strong>${r.bus}</strong></td>
+      <td>${r.o}</td><td>${r.a}</td><td>${r.s}</td><td>${r.c}</td>
+      <td><span class="status-tag">${total}</span></td><td>${r.by}</td>
+      <td>${activeSession.role === 'admin' ? `<button onclick="delEntry(${r.id})" style="color:var(--danger);border:none;background:none;cursor:pointer">Delete</button>` : '—'}</td>
+    </tr>`;
+  });
+}
+
+function renderDriverReport() {
+  const container = document.getElementById('driver-report-list');
+  container.innerHTML = "";
+  const months = db_data.reduce((acc, r) => {
+    const m = r.date.substring(0, 7);
+    if (!acc[m]) acc[m] = [];
+    acc[m].push(r);
+    return acc;
+  }, {});
+
+  for (let m in months) {
+    const driverTotals = months[m].reduce((acc, r) => {
+      if (!acc[r.name]) acc[r.name] = { o:0, a:0, s:0, c:0, buses: new Set() };
+      acc[r.name].o += r.o; acc[r.name].a += r.a; acc[r.name].s += r.s; acc[r.name].c += r.c;
+      if(r.bus) acc[r.name].buses.add(r.bus);
+      return acc;
+    }, {});
+
+    let html = `<div class="month-wrap"><h4 class="month-head">Month: ${m}</h4><table>
+      <tr><th>Driver Name</th><th>Bus Numbers Used</th><th>O</th><th>A</th><th>S</th><th>C</th><th>Total Points</th></tr>`;
+    for (let name in driverTotals) {
+      const d = driverTotals[name];
+      const total = d.o+d.a+d.s+d.c;
+      html += `<tr>
+        <td><strong>${name}</strong></td>
+        <td><small>${Array.from(d.buses).join(', ') || 'N/A'}</small></td>
+        <td>${d.o}</td><td>${d.a}</td><td>${d.s}</td><td>${d.c}</td>
+        <td style="color:var(--primary); font-weight:bold">${total}</td>
+      </tr>`;
+    }
+    html += `</table></div>`;
+    container.innerHTML += html;
+  }
+}
+
+function renderAdminUserList() {
+    const list = document.getElementById('admin-user-list');
+    list.innerHTML = "";
+    db_users.forEach((u, index) => {
+        list.innerHTML += `<tr>
+            <td>${u.user}</td><td>${u.role}</td>
+            <td>${u.user === 'admin' ? '******' : u.pass}</td>
+            <td>${u.user !== 'admin' ? `<button onclick="delUser(${index})" style="color:var(--danger); border:none; background:none; cursor:pointer;">Delete</button>` : 'System Master'}</td>
+        </tr>`;
+    });
+}
+
+function addUser() {
+  const u = document.getElementById('new-u').value.trim();
+  const p = document.getElementById('new-p').value.trim();
+  if(!u || !p) return alert("Fill all fields");
+  if(db_users.find(x => x.user === u)) return alert("User exists");
+  db_users.push({user: u, pass: p, role: "staff"});
+  localStorage.setItem("bus_users", JSON.stringify(db_users));
+  document.getElementById('new-u').value = ""; document.getElementById('new-p').value = "";
+  renderAdminUserList();
+}
+
+function delUser(idx) {
+    if(confirm("Delete staff account?")) { db_users.splice(idx, 1); localStorage.setItem("bus_users", JSON.stringify(db_users)); renderAdminUserList(); }
+}
+
+function delEntry(id) {
+  if(confirm("Delete record?")) { db_data = db_data.filter(x => x.id !== id); localStorage.setItem("bus_data", JSON.stringify(db_data)); renderRecent(); }
+}
+</script>
 </body>
 </html>
