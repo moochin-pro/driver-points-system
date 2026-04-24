@@ -1,99 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Driver Performance System - Admin Ready</title>
-<style>
-  :root { --primary: #1b7f2a; --danger: #dc3545; --dark: #2d3436; --light: #f9f9f9; }
-  body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 20px; }
-  .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
-  .tab-btn { padding: 12px 20px; cursor: pointer; border: none; background: none; font-weight: bold; color: #636e72; }
-  .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
-  input { padding: 12px; border: 1px solid #dfe6e9; border-radius: 6px; width: 100%; box-sizing: border-box; }
-  button.save-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 16px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-  th { background: #f1f2f6; font-size: 13px; }
-  .hidden { display: none; }
-  .status-tag { font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #e8f5e9; color: #2e7d32; font-weight: bold; }
-  .month-wrap { margin-top: 30px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
-  .month-head { background: var(--dark); color: white; padding: 10px 15px; margin: 0; }
-</style>
-</head>
-<body>
-
-<div id="auth-page" class="container" style="max-width: 400px; margin-top: 80px;">
-  <h2 style="text-align: center; color: var(--primary);">System Login</h2>
-  <input type="text" id="u-name" placeholder="Username" style="margin-bottom: 10px;">
-  <input type="password" id="u-pass" placeholder="Password">
-  <button class="save-btn" onclick="doLogin()" style="margin-top: 15px;">Login</button>
-</div>
-
-<div id="app-page" class="container hidden">
-  <button onclick="location.reload()" style="float:right; background:#b2bec3; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">Logout</button>
-  <h2 id="user-greet">Dashboard</h2>
-
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('entry-tab')">Input Points</button>
-    <button class="tab-btn" onclick="switchTab('report-tab')">Driver Summary</button>
-    <button id="adm-nav" class="tab-btn hidden" onclick="switchTab('adm-tab')">Manage Users</button>
-  </div>
-
-  <div id="entry-tab" class="page">
-    <div class="grid">
-      <input type="text" id="in-name" placeholder="Driver Name">
-      <input type="text" id="in-bus" placeholder="Bus Number">
-      <input type="date" id="in-date">
-      <input type="number" id="in-o" placeholder="O (0-10)">
-      <input type="number" id="in-a" placeholder="A (0-10)">
-      <input type="number" id="in-s" placeholder="S (0-10)">
-      <input type="number" id="in-c" placeholder="C (0-10)">
-    </div>
-    <button class="save-btn" id="save-btn-node" onclick="saveData()">Save Entry</button>
-    <h3>Recent Activity</h3>
-    <table>
-      <thead><tr><th>Date</th><th>Driver</th><th>Bus</th><th>O</th><th>A</th><th>S</th><th>C</th><th>Total</th><th>User</th></tr></thead>
-      <tbody id="recent-list"></tbody>
-    </table>
-  </div>
-
-  <div id="report-tab" class="page hidden">
-    <h3>Monthly Totals</h3>
-    <div id="driver-report-list"></div>
-  </div>
-
-  <div id="adm-tab" class="page hidden">
-    <h3>User Management</h3>
-    <div class="grid">
-      <input type="text" id="new-u" placeholder="New Username">
-      <input type="text" id="new-p" placeholder="New Password">
-      <button class="save-btn" onclick="addUser()">Create Staff Account</button>
-    </div>
-    <h4 style="margin-top: 30px;">Active System Users</h4>
-    <table>
-      <thead><tr><th>Username</th><th>Role</th><th>Password</th><th>Action</th></tr></thead>
-      <tbody id="admin-user-list"></tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-// For now, users are still in this list. 
-// TIP: If you want your friend to see new users, you must add a "users" table in Neon too!
-let db_users = JSON.parse(localStorage.getItem("bus_users")) || [{user: "admin", pass: "Cambolink21@123", role: "admin"}];
 let activeSession = null;
 
-function doLogin() {
+// --- LOGIN FROM CLOUD ---
+async function doLogin() {
   const u = document.getElementById('u-name').value;
   const p = document.getElementById('u-pass').value;
-  const user = db_users.find(x => x.user === u && x.pass === p);
+  
+  const res = await fetch('/api/data?type=users');
+  const db_users = await res.json();
+  
+  const user = db_users.find(x => x.username === u && x.password === p);
+  
   if (user) {
-    activeSession = user;
+    activeSession = { user: user.username, role: user.role };
     document.getElementById('auth-page').classList.add('hidden');
     document.getElementById('app-page').classList.remove('hidden');
-    document.getElementById('user-greet').innerText = `Welcome, ${user.user}`;
+    document.getElementById('user-greet').innerText = `Welcome, ${user.username}`;
+    
     if (user.role === 'admin') {
         document.getElementById('adm-nav').classList.remove('hidden');
         renderAdminUserList();
@@ -102,80 +24,39 @@ function doLogin() {
   } else { alert("Invalid Credentials"); }
 }
 
-function switchTab(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.remove('hidden');
-  event.currentTarget.classList.add('active');
-  if (id === 'report-tab') renderDriverReport();
-}
+// --- ADD USER TO CLOUD ---
+async function addUser() {
+  const u = document.getElementById('new-u').value.trim();
+  const p = document.getElementById('new-p').value.trim();
+  if(!u || !p) return alert("Fill all fields");
 
-// SAVE TO NEON
-async function saveData() {
-  const entry = {
-    name: document.getElementById('in-name').value,
-    bus: document.getElementById('in-bus').value,
-    date: document.getElementById('in-date').value,
-    o: parseInt(document.getElementById('in-o').value) || 0,
-    a: parseInt(document.getElementById('in-a').value) || 0,
-    s: parseInt(document.getElementById('in-s').value) || 0,
-    c: parseInt(document.getElementById('in-c').value) || 0,
-    by: activeSession.user
-  };
-
-  const res = await fetch('/api/data', {
+  const res = await fetch('/api/data?type=users', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entry)
+    body: JSON.stringify({ u, p })
   });
 
   if (res.ok) {
-    renderRecent();
-    alert("Saved to Neon Cloud!");
+    alert("User created in Cloud!");
+    renderAdminUserList();
+    document.getElementById('new-u').value = "";
+    document.getElementById('new-p').value = "";
   }
 }
 
-// LOAD FROM NEON
-async function renderRecent() {
-  const list = document.getElementById('recent-list');
-  const res = await fetch('/api/data');
-  const data = await res.json();
-  list.innerHTML = "";
-  data.forEach(r => {
-    const total = r.points_o + r.points_a + r.points_s + r.points_c;
-    list.innerHTML += `<tr>
-      <td>${r.entry_date.split('T')[0]}</td><td>${r.driver_name}</td><td>${r.bus_number}</td>
-      <td>${r.points_o}</td><td>${r.points_a}</td><td>${r.points_s}</td><td>${r.points_c}</td>
-      <td><span class="status-tag">${total}</span></td><td>${r.created_by}</td>
-    </tr>`;
-  });
-}
-
-// ADMIN FUNCTIONS
-function renderAdminUserList() {
+async function renderAdminUserList() {
     const list = document.getElementById('admin-user-list');
+    const res = await fetch('/api/data?type=users');
+    const users = await res.json();
+    
     list.innerHTML = "";
-    db_users.forEach((u, index) => {
+    users.forEach((u) => {
         list.innerHTML += `<tr>
-            <td>${u.user}</td><td>${u.role}</td>
-            <td>${u.user === 'admin' ? '******' : u.pass}</td>
-            <td>${u.user !== 'admin' ? `<button onclick="delUser(${index})" style="color:var(--danger); border:none; background:none; cursor:pointer;">Delete</button>` : 'System Master'}</td>
+            <td>${u.username}</td><td>${u.role}</td>
+            <td>${u.role === 'admin' ? '******' : u.password}</td>
+            <td>—</td>
         </tr>`;
     });
 }
 
-function addUser() {
-  const u = document.getElementById('new-u').value.trim();
-  const p = document.getElementById('new-p').value.trim();
-  if(!u || !p) return alert("Fill all fields");
-  db_users.push({user: u, pass: p, role: "staff"});
-  localStorage.setItem("bus_users", JSON.stringify(db_users)); // For now, users stay local
-  renderAdminUserList();
-}
-
-function delUser(idx) {
-    if(confirm("Delete staff account?")) { db_users.splice(idx, 1); localStorage.setItem("bus_users", JSON.stringify(db_users)); renderAdminUserList(); }
-}
-</script>
-</body>
-</html>
+// Keep your existing saveData, renderRecent, and switchTab functions the same!
