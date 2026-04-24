@@ -2,26 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Driver Performance System - Cloud Sync</title>
+<title>Driver Performance System - Admin Ready</title>
 <style>
   :root { --primary: #1b7f2a; --danger: #dc3545; --dark: #2d3436; --light: #f9f9f9; }
   body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 20px; }
   .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-  
   .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #eee; }
   .tab-btn { padding: 12px 20px; cursor: pointer; border: none; background: none; font-weight: bold; color: #636e72; }
   .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); }
-
   .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 20px; }
   input { padding: 12px; border: 1px solid #dfe6e9; border-radius: 6px; width: 100%; box-sizing: border-box; }
-  
   button.save-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-size: 16px; }
-  button.save-btn:disabled { background: #ccc; }
-  
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
   th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-  th { background: #f1f2f6; font-size: 13px; color: #2d3436; }
-  
+  th { background: #f1f2f6; font-size: 13px; }
   .hidden { display: none; }
   .status-tag { font-size: 11px; padding: 3px 8px; border-radius: 12px; background: #e8f5e9; color: #2e7d32; font-weight: bold; }
   .month-wrap { margin-top: 30px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
@@ -43,7 +37,8 @@
 
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('entry-tab')">Input Points</button>
-    <button class="tab-btn" onclick="switchTab('report-tab')">Driver Monthly Summary</button>
+    <button class="tab-btn" onclick="switchTab('report-tab')">Driver Summary</button>
+    <button id="adm-nav" class="tab-btn hidden" onclick="switchTab('adm-tab')">Manage Users</button>
   </div>
 
   <div id="entry-tab" class="page">
@@ -51,35 +46,43 @@
       <input type="text" id="in-name" placeholder="Driver Name">
       <input type="text" id="in-bus" placeholder="Bus Number">
       <input type="date" id="in-date">
-      <input type="number" id="in-o" placeholder="Outfit (0-10)">
-      <input type="number" id="in-a" placeholder="Action (0-10)">
-      <input type="number" id="in-s" placeholder="Skill (0-10)">
-      <input type="number" id="in-c" placeholder="Comm (0-10)">
+      <input type="number" id="in-o" placeholder="O (0-10)">
+      <input type="number" id="in-a" placeholder="A (0-10)">
+      <input type="number" id="in-s" placeholder="S (0-10)">
+      <input type="number" id="in-c" placeholder="C (0-10)">
     </div>
-    <button class="save-btn" id="save-btn-node" onclick="saveData()">Save to Neon Cloud</button>
-
-    <h3>Detailed Recent Activity (Live from Neon)</h3>
+    <button class="save-btn" id="save-btn-node" onclick="saveData()">Save Entry</button>
+    <h3>Recent Activity</h3>
     <table>
-      <thead>
-        <tr>
-          <th>Date</th><th>Driver</th><th>Bus</th>
-          <th>O</th><th>A</th><th>S</th><th>C</th>
-          <th>Total</th><th>User</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Date</th><th>Driver</th><th>Bus</th><th>O</th><th>A</th><th>S</th><th>C</th><th>Total</th><th>User</th></tr></thead>
       <tbody id="recent-list"></tbody>
     </table>
   </div>
 
   <div id="report-tab" class="page hidden">
-    <h3>Monthly Totals by Driver</h3>
+    <h3>Monthly Totals</h3>
     <div id="driver-report-list"></div>
+  </div>
+
+  <div id="adm-tab" class="page hidden">
+    <h3>User Management</h3>
+    <div class="grid">
+      <input type="text" id="new-u" placeholder="New Username">
+      <input type="text" id="new-p" placeholder="New Password">
+      <button class="save-btn" onclick="addUser()">Create Staff Account</button>
+    </div>
+    <h4 style="margin-top: 30px;">Active System Users</h4>
+    <table>
+      <thead><tr><th>Username</th><th>Role</th><th>Password</th><th>Action</th></tr></thead>
+      <tbody id="admin-user-list"></tbody>
+    </table>
   </div>
 </div>
 
 <script>
-// Simple login check (Passwords stay here for now)
-let db_users = [{user: "admin", pass: "Cambolink21@123", role: "admin"}];
+// For now, users are still in this list. 
+// TIP: If you want your friend to see new users, you must add a "users" table in Neon too!
+let db_users = JSON.parse(localStorage.getItem("bus_users")) || [{user: "admin", pass: "Cambolink21@123", role: "admin"}];
 let activeSession = null;
 
 function doLogin() {
@@ -91,7 +94,11 @@ function doLogin() {
     document.getElementById('auth-page').classList.add('hidden');
     document.getElementById('app-page').classList.remove('hidden');
     document.getElementById('user-greet').innerText = `Welcome, ${user.user}`;
-    renderRecent(); // Fetch cloud data on login
+    if (user.role === 'admin') {
+        document.getElementById('adm-nav').classList.remove('hidden');
+        renderAdminUserList();
+    }
+    renderRecent();
   } else { alert("Invalid Credentials"); }
 }
 
@@ -103,12 +110,11 @@ function switchTab(id) {
   if (id === 'report-tab') renderDriverReport();
 }
 
-// --- CLOUD SAVE FUNCTION ---
+// SAVE TO NEON
 async function saveData() {
-  const btn = document.getElementById('save-btn-node');
   const entry = {
-    name: document.getElementById('in-name').value.trim(),
-    bus: document.getElementById('in-bus').value.trim(),
+    name: document.getElementById('in-name').value,
+    bus: document.getElementById('in-bus').value,
     date: document.getElementById('in-date').value,
     o: parseInt(document.getElementById('in-o').value) || 0,
     a: parseInt(document.getElementById('in-a').value) || 0,
@@ -117,100 +123,58 @@ async function saveData() {
     by: activeSession.user
   };
 
-  if(!entry.name || !entry.date) return alert("Driver Name and Date required");
-  if(entry.o > 10 || entry.a > 10 || entry.s > 10 || entry.c > 10) return alert("Limit is 10 points!");
+  const res = await fetch('/api/data', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry)
+  });
 
-  btn.disabled = true;
-  btn.innerText = "Syncing with Neon...";
-
-  try {
-    const response = await fetch('/api/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(entry)
-    });
-
-    if (response.ok) {
-      await renderRecent(); // Refresh list from cloud
-      ['in-name','in-bus','in-o','in-a','in-s','in-c'].forEach(id => document.getElementById(id).value = "");
-      alert("Data stored successfully! Your friend can see it now.");
-    } else {
-      alert("Error: Could not reach the database.");
-    }
-  } catch (err) {
-    alert("Connection Failed. Check your Vercel/Neon settings.");
-  } finally {
-    btn.disabled = false;
-    btn.innerText = "Save to Neon Cloud";
+  if (res.ok) {
+    renderRecent();
+    alert("Saved to Neon Cloud!");
   }
 }
 
-// --- CLOUD LOAD FUNCTION ---
+// LOAD FROM NEON
 async function renderRecent() {
   const list = document.getElementById('recent-list');
-  try {
-    const response = await fetch('/api/data');
-    const cloudData = await response.json();
-
-    list.innerHTML = "";
-    cloudData.forEach(r => {
-      const total = r.points_o + r.points_a + r.points_s + r.points_c;
-      // Convert SQL date to readable format
-      const displayDate = r.entry_date ? new Date(r.entry_date).toISOString().split('T')[0] : 'N/A';
-      
-      list.innerHTML += `<tr>
-        <td>${displayDate}</td><td>${r.driver_name}</td><td><strong>${r.bus_number}</strong></td>
-        <td>${r.points_o}</td><td>${r.points_a}</td><td>${r.points_s}</td><td>${r.points_c}</td>
-        <td><span class="status-tag">${total}</span></td><td>${r.created_by}</td>
-      </tr>`;
-    });
-  } catch (err) {
-    console.error("Failed to load data:", err);
-  }
+  const res = await fetch('/api/data');
+  const data = await res.json();
+  list.innerHTML = "";
+  data.forEach(r => {
+    const total = r.points_o + r.points_a + r.points_s + r.points_c;
+    list.innerHTML += `<tr>
+      <td>${r.entry_date.split('T')[0]}</td><td>${r.driver_name}</td><td>${r.bus_number}</td>
+      <td>${r.points_o}</td><td>${r.points_a}</td><td>${r.points_s}</td><td>${r.points_c}</td>
+      <td><span class="status-tag">${total}</span></td><td>${r.created_by}</td>
+    </tr>`;
+  });
 }
 
-// Report logic remains similar but uses the cloud data
-async function renderDriverReport() {
-  const container = document.getElementById('driver-report-list');
-  container.innerHTML = "Loading reports...";
-  
-  const response = await fetch('/api/data');
-  const cloudData = await response.json();
-  container.innerHTML = "";
+// ADMIN FUNCTIONS
+function renderAdminUserList() {
+    const list = document.getElementById('admin-user-list');
+    list.innerHTML = "";
+    db_users.forEach((u, index) => {
+        list.innerHTML += `<tr>
+            <td>${u.user}</td><td>${u.role}</td>
+            <td>${u.user === 'admin' ? '******' : u.pass}</td>
+            <td>${u.user !== 'admin' ? `<button onclick="delUser(${index})" style="color:var(--danger); border:none; background:none; cursor:pointer;">Delete</button>` : 'System Master'}</td>
+        </tr>`;
+    });
+}
 
-  const months = cloudData.reduce((acc, r) => {
-    const m = r.entry_date.substring(0, 7);
-    if (!acc[m]) acc[m] = [];
-    acc[m].push(r);
-    return acc;
-  }, {});
+function addUser() {
+  const u = document.getElementById('new-u').value.trim();
+  const p = document.getElementById('new-p').value.trim();
+  if(!u || !p) return alert("Fill all fields");
+  db_users.push({user: u, pass: p, role: "staff"});
+  localStorage.setItem("bus_users", JSON.stringify(db_users)); // For now, users stay local
+  renderAdminUserList();
+}
 
-  for (let m in months) {
-    const driverTotals = months[m].reduce((acc, r) => {
-      if (!acc[r.driver_name]) acc[r.driver_name] = { o:0, a:0, s:0, c:0, buses: new Set() };
-      acc[r.driver_name].o += r.points_o; 
-      acc[r.driver_name].a += r.points_a; 
-      acc[r.driver_name].s += r.points_s; 
-      acc[r.driver_name].c += r.points_c;
-      if(r.bus_number) acc[r.driver_name].buses.add(r.bus_number);
-      return acc;
-    }, {});
-
-    let html = `<div class="month-wrap"><h4 class="month-head">Month: ${m}</h4><table>
-      <tr><th>Driver Name</th><th>Buses</th><th>O</th><th>A</th><th>S</th><th>C</th><th>Total</th></tr>`;
-    for (let name in driverTotals) {
-      const d = driverTotals[name];
-      const total = d.o+d.a+d.s+d.c;
-      html += `<tr>
-        <td><strong>${name}</strong></td>
-        <td><small>${Array.from(d.buses).join(', ')}</small></td>
-        <td>${d.o}</td><td>${d.a}</td><td>${d.s}</td><td>${d.c}</td>
-        <td style="color:var(--primary); font-weight:bold">${total}</td>
-      </tr>`;
-    }
-    html += `</table></div>`;
-    container.innerHTML += html;
-  }
+function delUser(idx) {
+    if(confirm("Delete staff account?")) { db_users.splice(idx, 1); localStorage.setItem("bus_users", JSON.stringify(db_users)); renderAdminUserList(); }
 }
 </script>
 </body>
